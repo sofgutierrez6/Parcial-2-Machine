@@ -161,6 +161,15 @@ for etiqueta in etiquetas:
         rem = rem + 1
     else:
         no_se_sabe = no_se_sabe + 1
+        
+#%%
+datos_np = np.array(datos)
+np.save('./datos.npy', datos_np)
+#%%
+etiquetas_np = np.array(etiquetas)
+np.save('./etiquetas.npy', etiquetas_np)
+descriptores_np = np.array(descriptores)
+np.save('./descriptores.npy', descriptores_np)
 #%%
 # train_size = int(len(etiquetas_reales) * 0.8)
 # test_size = int(len(etiquetas_reales) * 0.1)
@@ -175,7 +184,6 @@ for etiqueta in etiquetas:
 # y_val = np.array([etiquetas_reales[train_size+test_size:len(etiquetas_reales)]]).transpose()
 # y_val = to_categorical(y_val, 4)
 
-etiquetas_np = np.array(etiquetas)
 etiquetas_cat = to_categorical(etiquetas_np, 4)
 descriptores_np = np.array(descriptores).transpose()
 minimo = descriptores_np.min(axis=0)
