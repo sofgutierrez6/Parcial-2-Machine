@@ -30,22 +30,20 @@ maximo = descriptores_np.max(axis=0)
 #media = descriptores_np.mean(axis=0)
 #desv = descriptores_np.std(axis=0)
 descriptores_norm = ((descriptores_np - minimo)/(maximo-minimo))
-
-#dat_train, dat_prueba, etiq_train_1, etiq_prueba_1 = train_test_split(datos, etiquetas_np, test_size=0.2, random_state=4)
-#dat_test, dat_val, y_test_1, y_val_1 = train_test_split(X_prueba, y_prueba_1, test_size=0.5, random_state=4)
-
-des_train, des_prueba, etiq_train, etiq_prueba = train_test_split(descriptores_norm, etiquetas_cat, test_size=0.2, random_state=4)
-des_test, des_val, etiq_test, etiq_val = train_test_split(des_prueba, etiq_prueba, test_size=0.5, random_state=4)
+#%%
+dat_train, dat_prueba, etiq_train_1, etiq_prueba_1 = train_test_split(datos, etiquetas_cat, test_size=10456, random_state=4)
+dat_test, dat_val, y_test_1, y_val_1 = train_test_split(dat_prueba, etiq_prueba_1, test_size=0.5, random_state=4)
 
 #%%
-des_train_rec = des_train[0:len(des_train)-4,:]
-etiq_train_rec = etiq_train[0:len(etiq_train)-4]
+des_train, des_prueba, etiq_train, etiq_prueba = train_test_split(descriptores_norm, etiquetas_cat, test_size=10456, random_state=4)
+des_test, des_val, etiq_test, etiq_val = train_test_split(des_prueba, etiq_prueba, test_size=0.5, random_state=4)
+
 #%%
 funcion_activacion = 'relu'
 initializer = tf.keras.initializers.glorot_uniform(seed=0)
 # Creación de la red
 modelo = tf.keras.Sequential()
-modelo.add(layers.Dense(750, input_shape = (des_train_rec.shape[1],),
+modelo.add(layers.Dense(750, input_shape = (des_train.shape[1],),
                   activation = funcion_activacion))
 modelo.add(Dropout(rate=0.5))
 modelo.add(layers.Dense(500, 
@@ -65,12 +63,22 @@ modelo.compile(optimizer=Optimizer,
                metrics=['accuracy'])
 modelo.summary()
 #%%
-history = modelo.fit(x=des_train_rec,
-                     y=etiq_train_rec,
+history = modelo.fit(x=des_train,
+                     y=etiq_train,
+                     shuffle=True,
                      steps_per_epoch=100,
                      epochs=200,
                      validation_data=(des_val, etiq_val),
                      initial_epoch=0)
+
+#%%
+history2 = modelo.fit(x=des_train,
+                     y=etiq_train,
+                     shuffle=True,
+                     steps_per_epoch=100,
+                     epochs=200,
+                     validation_data=(des_val, etiq_val),
+                     initial_epoch=200)
 
 #%%
 prediccion_test = modelo.predict(x=des_test)
@@ -79,10 +87,10 @@ etiquetas_prediccion = np.argmax(prediccion_test, axis=1)
 cnf_matrix = confusion_matrix(etiquetas_test, etiquetas_prediccion)
 print("Matriz de confusión")
 print(cnf_matrix)
-
+print (classification_report(etiquetas_test, etiquetas_prediccion))
 #%%
 # Guardar el Modelo
-modelo.save('./modelo_11345.h5')
+modelo.save('./modelo_13039.h5')
 # Recrea exactamente el mismo modelo solo desde el archivo
 # new_model = tf.keras.models.load_model('path_to_my_model.h5')
 #%%
